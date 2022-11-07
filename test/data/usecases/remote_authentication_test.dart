@@ -19,6 +19,16 @@ void main() {
       email: faker.internet.email(),
       password: faker.internet.password(),
     );
+
+    when(httpClient.request(
+            url: anyNamed('url'),
+            method: anyNamed('method'),
+            body: anyNamed('body')))
+        .thenAnswer((_) async => {
+              'accessToken': faker.guid.guid(),
+              'name': faker.person.name(),
+            });
+
     final sut = RemoteAuthentication(httpClient: httpClient, url: url);
     await sut.auth(params);
 
@@ -95,7 +105,8 @@ void main() {
     expect(future, throwsA(DomainError.unexpected));
   });
 
-  test('Should throw InvalidCredencialsError if httpClient returns 401', () async {
+  test('Should throw InvalidCredencialsError if httpClient returns 401',
+      () async {
     final httpClient = HttpClientSpy();
     final url = faker.internet.httpUrl();
 
@@ -114,5 +125,31 @@ void main() {
     final future = sut.auth(params);
 
     expect(future, throwsA(DomainError.invalidCredecials));
+  });
+
+  test('Should return an Account if httpClient returns 200', () async {
+    final httpClient = HttpClientSpy();
+    final url = faker.internet.httpUrl();
+
+    final params = AuthenticationParams(
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    );
+
+    final accessToken = faker.guid.guid();
+
+    when(httpClient.request(
+            url: anyNamed('url'),
+            method: anyNamed('method'),
+            body: anyNamed('body')))
+        .thenAnswer((_) async => {
+              'accessToken': accessToken,
+              'name': faker.person.name(),
+            });
+
+    final sut = RemoteAuthentication(httpClient: httpClient, url: url);
+    final account = await sut.auth(params);
+
+    expect(account.token, accessToken);
   });
 }
