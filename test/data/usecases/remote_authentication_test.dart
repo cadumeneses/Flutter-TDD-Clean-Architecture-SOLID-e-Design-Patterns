@@ -152,4 +152,29 @@ void main() {
 
     expect(account.token, accessToken);
   });
+
+  test(
+      'Should throw UnexpectedError if httpClient returns 200 with invalid data',
+      () async {
+    final httpClient = HttpClientSpy();
+    final url = faker.internet.httpUrl();
+
+    final params = AuthenticationParams(
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    );
+
+    when(httpClient.request(
+            url: anyNamed('url'),
+            method: anyNamed('method'),
+            body: anyNamed('body')))
+        .thenAnswer((_) async => {
+              'invalild_token': 'invalid_value',
+            });
+
+    final sut = RemoteAuthentication(httpClient: httpClient, url: url);
+    final future = sut.auth(params);
+
+    expect(future, throwsA(DomainError.unexpected));
+  });
 }
