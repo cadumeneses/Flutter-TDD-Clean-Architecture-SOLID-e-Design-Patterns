@@ -97,6 +97,7 @@ void main() {
     url = faker.internet.httpUrl();
     registerFallbackValue(Uri.parse(url));
   });
+
   group('post', () {
     test('Should call post with correct values', () async {
       await sut
@@ -138,7 +139,15 @@ void main() {
 
   test('Should return null if post returns 200 with no data', () async {
     client.mockPost(200, body: '');
-    
+
+    final response = await sut.request(url: url, method: 'post');
+
+    expect(response, null);
+  });
+
+  test('Should return null if post returns 204', () async {
+    client.mockPost(204, body: '');
+
     final response = await sut.request(url: url, method: 'post');
 
     expect(response, null);
