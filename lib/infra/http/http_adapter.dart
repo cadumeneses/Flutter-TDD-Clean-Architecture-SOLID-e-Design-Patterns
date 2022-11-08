@@ -3,7 +3,7 @@ import 'package:http/http.dart';
 
 import '../../data/http/http_error.dart';
 
-class HttpAdapter{
+class HttpAdapter {
   final Client client;
   HttpAdapter({required this.client});
   Future<dynamic> request(
@@ -46,6 +46,8 @@ class HttpAdapter{
         throw HttpError.badRequest;
       case 401:
         throw HttpError.unauthorized;
+      case 403:
+        throw HttpError.forbiden;
       case 404:
         throw HttpError.notFound;
       default:
