@@ -125,14 +125,6 @@ void main() {
     expect(future, throwsA(HttpError.badRequest));
   });
 
-  test('Should return ServerError if post returns 500', () async {
-    client.mockPost(500);
-
-    final future = sut.request(url: url, method: 'post');
-
-    expect(future, throwsA(HttpError.serverError));
-  });
-
   test('Should return UnauthorizedError if post returns 401', () async {
     client.mockPost(401);
 
@@ -155,5 +147,21 @@ void main() {
     final future = sut.request(url: url, method: 'post');
 
     expect(future, throwsA(HttpError.notFound));
+  });
+
+  test('Should return ServerError if post returns 500', () async {
+    client.mockPost(500);
+
+    final future = sut.request(url: url, method: 'post');
+
+    expect(future, throwsA(HttpError.serverError));
+  });
+
+  test('Should return ServerError if post throws', () async {
+    client.mockPostError();
+
+    final future = sut.request(url: url, method: 'post');
+
+    expect(future, throwsA(HttpError.serverError));
   });
 }
