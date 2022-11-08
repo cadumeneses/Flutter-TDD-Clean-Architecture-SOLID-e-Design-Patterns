@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart';
 
-class HttpAdapter {
+class HttpAdapter{
   final Client client;
   HttpAdapter({required this.client});
   Future<dynamic> request(
@@ -128,5 +128,11 @@ void main() {
           any(),
           headers: any(named: 'headers'),
         ));
+  });
+
+  test('Should return data if post returns 200', () async {
+    final response = await sut.request(url: url, method: 'post');
+
+    expect(response, {'any_key': 'any_value'});
   });
 }
