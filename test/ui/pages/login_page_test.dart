@@ -12,19 +12,23 @@ void main() {
   late LoginPresenter presenter;
 
   late StreamController<String> emailErrorController;
+  late StreamController<String> mainErrorController;
   late StreamController<bool> isFormValidController;
-  late StreamController<bool> isLoadingController; 
+  late StreamController<bool> isLoadingController;
 
   Future<void> loadPage(WidgetTester tester) async {
     presenter = LoginPresenterSpy();
     emailErrorController = StreamController<String>();
+    mainErrorController = StreamController<String>();
     isFormValidController = StreamController<bool>();
     isLoadingController = StreamController<bool>();
     when(() => presenter.emailErrorStream)
         .thenAnswer((_) => emailErrorController.stream);
+    when(() => presenter.mainErrorStream)
+        .thenAnswer((_) => mainErrorController.stream);
     when(() => presenter.isFormValidStream)
         .thenAnswer((_) => isFormValidController.stream);
-     when(() => presenter.isLoadingStream)
+    when(() => presenter.isLoadingStream)
         .thenAnswer((_) => isLoadingController.stream);
     final loginPage = MaterialApp(home: LoginPage(presenter));
     await tester.pumpWidget(loginPage);
@@ -32,6 +36,7 @@ void main() {
 
   tearDown(() {
     emailErrorController.close();
+    mainErrorController.close();
     isFormValidController.close();
     isLoadingController.close();
   });
@@ -106,8 +111,7 @@ void main() {
     verify(() => presenter.auth()).called(1);
   });
 
-  testWidgets('Shold present loading',
-      (WidgetTester tester) async {
+  testWidgets('Shold present loading', (WidgetTester tester) async {
     await loadPage(tester);
 
     isLoadingController.add(true);
@@ -115,8 +119,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('Shold hide loading',
-      (WidgetTester tester) async {
+  testWidgets('Shold hide loading', (WidgetTester tester) async {
     await loadPage(tester);
 
     isLoadingController.add(true);
@@ -125,5 +128,15 @@ void main() {
     isLoadingController.add(false);
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('Shold present error menssage if authentication fails',
+      (WidgetTester tester) async {
+    await loadPage(tester);
+
+    mainErrorController.add('main error');
+    await tester.pump();
+
+    expect(find.text('main error'), findsOneWidget);
   });
 }
