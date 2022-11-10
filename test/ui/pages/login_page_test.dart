@@ -12,12 +12,16 @@ void main() {
   late LoginPresenter presenter;
 
   late StreamController<String> emailErrorController;
+  late StreamController<bool> isFormValidController;
 
   Future<void> loadPage(WidgetTester tester) async {
     presenter = LoginPresenterSpy();
     emailErrorController = StreamController<String>();
-    when(()=>presenter.emailErrorStream)
+    isFormValidController = StreamController<bool>();
+    when(() => presenter.emailErrorStream)
         .thenAnswer((_) => emailErrorController.stream);
+    when(() => presenter.isFormValidStream)
+        .thenAnswer((_) => isFormValidController.stream);
     final loginPage = MaterialApp(home: LoginPage(presenter));
     await tester.pumpWidget(loginPage);
   }
@@ -72,7 +76,7 @@ void main() {
     verify(() => presenter.validatePassword(password));
   });
 
-  testWidgets('Shold call validate with correct values',
+  testWidgets('Should present error if email is invalid',
       (WidgetTester tester) async {
     await loadPage(tester);
 
@@ -81,5 +85,16 @@ void main() {
     await tester.pump();
 
     expect(find.text('any error'), findsOneWidget);
+  });
+
+  testWidgets('Shold call authentication on form submit',
+      (WidgetTester tester) async {
+    await loadPage(tester);
+
+    isFormValidController.add(true);
+    await tester.pump();
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pump();
+    verify(() => presenter.auth()).called(1);
   });
 }
