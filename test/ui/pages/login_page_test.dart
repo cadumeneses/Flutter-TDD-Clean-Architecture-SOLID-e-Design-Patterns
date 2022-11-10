@@ -13,21 +13,27 @@ void main() {
 
   late StreamController<String> emailErrorController;
   late StreamController<bool> isFormValidController;
+  late StreamController<bool> isLoadingController; 
 
   Future<void> loadPage(WidgetTester tester) async {
     presenter = LoginPresenterSpy();
     emailErrorController = StreamController<String>();
     isFormValidController = StreamController<bool>();
+    isLoadingController = StreamController<bool>();
     when(() => presenter.emailErrorStream)
         .thenAnswer((_) => emailErrorController.stream);
     when(() => presenter.isFormValidStream)
         .thenAnswer((_) => isFormValidController.stream);
+     when(() => presenter.isLoadingStream)
+        .thenAnswer((_) => isLoadingController.stream);
     final loginPage = MaterialApp(home: LoginPage(presenter));
     await tester.pumpWidget(loginPage);
   }
 
   tearDown(() {
     emailErrorController.close();
+    isFormValidController.close();
+    isLoadingController.close();
   });
 
   testWidgets("Should load with correct initial state",
@@ -96,5 +102,14 @@ void main() {
     await tester.tap(find.byType(ElevatedButton));
     await tester.pump();
     verify(() => presenter.auth()).called(1);
+  });
+
+  testWidgets('Shold present loading',
+      (WidgetTester tester) async {
+    await loadPage(tester);
+
+    isLoadingController.add(true);
+    await tester.pump();
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 }
