@@ -16,12 +16,14 @@ void main() {
   late StreamController<bool> isFormValidController;
   late StreamController<bool> isLoadingController;
 
-  Future<void> loadPage(WidgetTester tester) async {
-    presenter = LoginPresenterSpy();
+  void initStreams() {
     emailErrorController = StreamController<String>();
     mainErrorController = StreamController<String>();
     isFormValidController = StreamController<bool>();
     isLoadingController = StreamController<bool>();
+  }
+
+  void mockStreams() {
     when(() => presenter.auth()).thenAnswer((_) async => _);
     when(() => presenter.emailErrorStream)
         .thenAnswer((_) => emailErrorController.stream);
@@ -31,15 +33,25 @@ void main() {
         .thenAnswer((_) => isFormValidController.stream);
     when(() => presenter.isLoadingStream)
         .thenAnswer((_) => isLoadingController.stream);
+  }
+
+  void closeStreams() {
+    emailErrorController.close();
+    mainErrorController.close();
+    isFormValidController.close();
+    isLoadingController.close();
+  }
+
+  Future<void> loadPage(WidgetTester tester) async {
+    presenter = LoginPresenterSpy();
+    initStreams();
+    mockStreams();
     final loginPage = MaterialApp(home: LoginPage(presenter));
     await tester.pumpWidget(loginPage);
   }
 
   tearDown(() {
-    emailErrorController.close();
-    mainErrorController.close();
-    isFormValidController.close();
-    isLoadingController.close();
+    closeStreams();
   });
 
   testWidgets("Should load with correct initial state",
@@ -141,11 +153,10 @@ void main() {
     expect(find.text('main error'), findsOneWidget);
   });
 
-  testWidgets('Shold close streams on dispose',
-      (WidgetTester tester) async {
+  testWidgets('Shold close streams on dispose', (WidgetTester tester) async {
     await loadPage(tester);
 
-    addTearDown((){
+    addTearDown(() {
       verify(() => presenter.dispose());
     });
   });
