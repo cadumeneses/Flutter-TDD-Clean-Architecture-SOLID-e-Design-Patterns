@@ -22,6 +22,7 @@ void main() {
     mainErrorController = StreamController<String>();
     isFormValidController = StreamController<bool>();
     isLoadingController = StreamController<bool>();
+    when(() => presenter.auth()).thenAnswer((_) async => _);
     when(() => presenter.emailErrorStream)
         .thenAnswer((_) => emailErrorController.stream);
     when(() => presenter.mainErrorStream)
