@@ -10,6 +10,7 @@ class AuthenticationParams extends Equatable {
   final String email;
   final String password;
 
+  @override
   List<Object> get props => [email, password];
 
   const AuthenticationParams({
