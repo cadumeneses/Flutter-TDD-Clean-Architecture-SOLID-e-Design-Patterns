@@ -41,17 +41,14 @@ void main() {
     sut.isFormValidStream
         .listen(expectAsync1((isValid) => expect(isValid, false)));
 
-
     sut.validateEmail(email);
     sut.validateEmail(email);
   });
 
   test('Should emit null if validation succeeds', () {
-    sut.emailErrorStream
-        .listen(expectAsync1((error) => expect(error, null)));
+    sut.emailErrorStream.listen(expectAsync1((error) => expect(error, null)));
     sut.isFormValidStream
         .listen(expectAsync1((isValid) => expect(isValid, false)));
-
 
     sut.validateEmail(email);
     sut.validateEmail(email);
@@ -59,7 +56,8 @@ void main() {
 
   test('Should call Validation with correct password', () {
     sut.validatePassword(password);
-    verify(() => validation.validate(field: 'password', value: password)).called(1);
+    verify(() => validation.validate(field: 'password', value: password))
+        .called(1);
   });
 
   test('Should emit Password error if validation fails', () {
@@ -70,7 +68,6 @@ void main() {
     sut.isFormValidStream
         .listen(expectAsync1((isValid) => expect(isValid, false)));
 
-
     sut.validatePassword(password);
     sut.validatePassword(password);
   });
@@ -80,7 +77,6 @@ void main() {
         .listen(expectAsync1((error) => expect(error, null)));
     sut.isFormValidStream
         .listen(expectAsync1((isValid) => expect(isValid, false)));
-
 
     sut.validatePassword(password);
     sut.validatePassword(password);
@@ -98,8 +94,20 @@ void main() {
     sut.isFormValidStream
         .listen(expectAsync1((isValid) => expect(isValid, false)));
 
+    sut.validateEmail(email);
+    sut.validatePassword(password);
+  });
+
+  test('Should emits form vaalid event is form valid', () async {
+    sut.emailErrorStream.listen(expectAsync1((error) => expect(error, null)));
+
+    sut.passwordErrorStream
+        .listen(expectAsync1((error) => expect(error, null)));
+
+    expectLater(sut.isFormValidStream, emitsInOrder([false, true]));
 
     sut.validateEmail(email);
+    await Future.delayed(Duration.zero);
     sut.validatePassword(password);
   });
 }
