@@ -1,8 +1,9 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:faker/faker.dart';
+import 'package:mocktail/mocktail.dart';
+
 import 'package:flutter_tdd/presentation/presenters/stream_login_presenter.dart';
 import 'package:flutter_tdd/presentation/protocols/protocols.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 
 class ValidationSpy extends Mock implements Validation {}
 
@@ -35,6 +36,9 @@ void main() {
 
     sut.emailErrorStream
         .listen(expectAsync1((error) => expect(error, 'error')));
+    sut.isFormValidStream
+        .listen(expectAsync1((isValid) => expect(isValid, false)));
+
 
     sut.validateEmail(email);
     sut.validateEmail(email);
