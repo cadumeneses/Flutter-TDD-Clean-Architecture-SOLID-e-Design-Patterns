@@ -1,3 +1,5 @@
+import 'package:flutter_tdd/domain/entities/entities.dart';
+import 'package:flutter_tdd/domain/helpers/helpers.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:faker/faker.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,7 +11,15 @@ import 'package:flutter_tdd/presentation/protocols/protocols.dart';
 
 class ValidationSpy extends Mock implements Validation {}
 
-class AuthenticationSpy extends Mock implements Authentication {}
+class AuthenticationSpy extends Mock implements Authentication {
+  When mockAuthenticationCall() => when(() => auth(any()));
+  void mockAuthentication() => mockAuthenticationCall()
+      .thenAnswer((_) async => AccountEntity(faker.guid.guid()));
+  void mockAuthenticationError(DomainError error) =>
+      mockAuthenticationCall().thenThrow(error);
+}
+
+class FakeParams extends Fake implements AuthenticationParams {} 
 
 void main() {
   late ValidationSpy validation;
@@ -25,6 +35,10 @@ void main() {
     mockValidationCall(field).thenReturn(value);
   }
 
+  setUpAll((){
+    registerFallbackValue(FakeParams());
+  });
+
   setUp(() {
     validation = ValidationSpy();
     authentication = AuthenticationSpy();
@@ -32,7 +46,7 @@ void main() {
         validation: validation, authentication: authentication);
     email = faker.internet.email();
     password = faker.internet.password();
-    mockValidation();
+    authentication.mockAuthentication();
   });
 
   test('Should call Validation with correct email', () {
@@ -129,5 +143,17 @@ void main() {
         AuthenticationParams(email: email, password: password),
       ),
     ).called(1);
+  });
+
+  test('Should emit correct events on InvalidCredencialsError', () async {
+    authentication.mockAuthenticationError(DomainError.invalidCredecials);
+    sut.validateEmail(email);
+    sut.validatePassword(password);
+
+    expectLater(sut.isLoadingStream, emits(false));
+    sut.mainErrorStream.listen(
+        expectAsync1((error) => expect(error, 'Credenciais Inválidas')));
+
+    await sut.auth();
   });
 }
