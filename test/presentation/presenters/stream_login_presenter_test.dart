@@ -1,10 +1,10 @@
-import 'package:flutter_tdd/domain/entities/entities.dart';
-import 'package:flutter_tdd/domain/helpers/helpers.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:faker/faker.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:flutter_tdd/domain/entities/entities.dart';
 import 'package:flutter_tdd/domain/usecases/usecase.dart';
+import 'package:flutter_tdd/domain/helpers/helpers.dart';
 
 import 'package:flutter_tdd/presentation/presenters/stream_login_presenter.dart';
 import 'package:flutter_tdd/presentation/protocols/protocols.dart';
@@ -153,6 +153,18 @@ void main() {
     expectLater(sut.isLoadingStream, emits(false));
     sut.mainErrorStream.listen(
         expectAsync1((error) => expect(error, 'Credenciais Inválidas')));
+
+    await sut.auth();
+  });
+
+  test('Should emit correct events on UnecpectedError', () async {
+    authentication.mockAuthenticationError(DomainError.unexpected);
+    sut.validateEmail(email);
+    sut.validatePassword(password);
+
+    expectLater(sut.isLoadingStream, emits(false));
+    sut.mainErrorStream.listen(
+        expectAsync1((error) => expect(error, 'Algo errado aconteceu. Tente novamente em breve.')));
 
     await sut.auth();
   });
