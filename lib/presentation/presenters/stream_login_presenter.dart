@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter_tdd/ui/pages/pages.dart';
+
 import '../../domain/usecases/usecase.dart';
 import '../../domain/helpers/domain.error.dart';
 
@@ -19,7 +21,7 @@ class LoginState {
   bool isLoading = false;
 }
 
-class StreamLoginPresenter {
+class StreamLoginPresenter implements LoginPresenter{
   final Validation validation;
   final Authentication authentication;
 
@@ -77,5 +79,10 @@ class StreamLoginPresenter {
     }
     _state.isLoading = false;
     _update();
+  }
+  
+  @override
+  void dispose() {
+    // TODO: implement dispose
   }
 }

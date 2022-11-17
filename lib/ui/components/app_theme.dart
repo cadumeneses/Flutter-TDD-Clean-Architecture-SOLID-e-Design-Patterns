@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import '../pages/pages.dart';
 
-class App extends StatelessWidget {
-  const App({super.key});
-
-  ThemeData makeAppTheme() {
+ThemeData makeAppTheme() {
     const primaryColor = Color.fromARGB(255, 250, 198, 226);
     const primaryColorDark = Color.fromRGBO(96, 0, 39, 1);
     const primaryColorLight = Color.fromRGBO(188, 71, 123, 1);
@@ -48,14 +44,3 @@ class App extends StatelessWidget {
       buttonTheme: buttonTheme,
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: '4Dev',
-      theme: makeAppTheme(),
-      debugShowCheckedModeBanner: false,
-      // home:  const LoginPage(null),
-    );
-  }
-}

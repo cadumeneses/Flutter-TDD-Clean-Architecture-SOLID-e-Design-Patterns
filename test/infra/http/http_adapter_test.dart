@@ -38,7 +38,7 @@ void main() {
 
   setUp(() {
     client = ClientSpy();
-    sut = HttpAdapter(client: client);
+    sut = HttpAdapter(client);
   });
 
   setUpAll(() {

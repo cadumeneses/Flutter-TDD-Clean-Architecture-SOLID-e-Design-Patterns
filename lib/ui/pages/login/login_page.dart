@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
           }
         });
         widget.presenter.mainErrorStream.listen((error) {
-          showErrorMessage(context, error);
+          showErrorMessage(context, error!);
         });
 
         return SingleChildScrollView(
