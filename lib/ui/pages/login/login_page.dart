@@ -14,6 +14,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  void _hideKeyboard() {
+    final currectFocus = FocusScope.of(context);
+    if (!currectFocus.hasPrimaryFocus) {
+      currectFocus.unfocus();
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -35,32 +43,35 @@ class _LoginPageState extends State<LoginPage> {
           showErrorMessage(context, error!);
         });
 
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const LoginHeader(),
-              const HeadLine1(text: 'Login'),
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Provider(
-                  create: (_) => widget.presenter,
-                  child: Form(
-                      child: Column(
-                    children: [
-                      const EmailInput(),
-                      const PasswordInput(),
-                      const LoginButton(),
-                      TextButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.person),
-                        label: const Text('Criar conta'),
-                      )
-                    ],
-                  )),
-                ),
-              )
-            ],
+        return GestureDetector(
+          onTap: _hideKeyboard,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const LoginHeader(),
+                const HeadLine1(text: 'Login'),
+                Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Provider(
+                    create: (_) => widget.presenter,
+                    child: Form(
+                        child: Column(
+                      children: [
+                        const EmailInput(),
+                        const PasswordInput(),
+                        const LoginButton(),
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.person),
+                          label: const Text('Criar conta'),
+                        )
+                      ],
+                    )),
+                  ),
+                )
+              ],
+            ),
           ),
         );
       }),
