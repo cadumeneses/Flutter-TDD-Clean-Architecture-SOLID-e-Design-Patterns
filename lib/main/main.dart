@@ -21,7 +21,6 @@ class App extends StatelessWidget {
       getPages: [
         GetPage(name: '/login', page: makeLoginPage)
       ],
-      // home:  const LoginPage(null),
     );
   }
 }
