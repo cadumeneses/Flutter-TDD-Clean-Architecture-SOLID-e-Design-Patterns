@@ -4,38 +4,42 @@ import '../pages/pages.dart';
 class App extends StatelessWidget {
   const App({super.key});
 
+  final primaryColor = const Color.fromRGBO(136, 14, 79, 1);
+  final primaryColorDark = const Color.fromRGBO(96, 0, 39, 1);
+  final primaryColorLight = const Color.fromRGBO(188, 71, 79, 1);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '4Dev',
       theme: ThemeData(
         primaryColor: const Color.fromRGBO(136, 14, 79, 1),
-        primaryColorDark: const Color.fromRGBO(96, 0, 39, 1),
-        primaryColorLight: const Color.fromRGBO(188, 71, 79, 1),
-        textTheme: const TextTheme(
+        primaryColorDark: primaryColorDark,
+        primaryColorLight: primaryColorLight,
+        textTheme: TextTheme(
             headline1: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Color.fromRGBO(96, 0, 39, 1))),
-        inputDecorationTheme: const InputDecorationTheme(
-          iconColor: Color.fromRGBO(188, 71, 79, 1),
-          focusColor: Color.fromRGBO(136, 14, 79, 1),
-          floatingLabelStyle: TextStyle(color: Color.fromRGBO(136, 14, 79, 1)),
-          labelStyle: TextStyle(color: Color.fromRGBO(188, 71, 79, 1)),
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: primaryColorDark,
+        )),
+        inputDecorationTheme: InputDecorationTheme(
+          iconColor: primaryColorLight,
+          focusColor: primaryColor,
+          floatingLabelStyle: TextStyle(color: primaryColor),
+          labelStyle: TextStyle(color: primaryColorLight),
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(
-              color: Color.fromRGBO(188, 71, 79, 1),
+              color: primaryColorLight,
             ),
           ),
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(
-              color: Color.fromRGBO(136, 14, 79, 1),
+              color: primaryColor,
             ),
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromRGBO(136, 14, 79, 1),
+              backgroundColor: primaryColor,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -43,7 +47,7 @@ class App extends StatelessWidget {
         ),
         textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(
-          foregroundColor: const Color.fromRGBO(136, 14, 79, 1),
+          foregroundColor: primaryColor,
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         )),
       ),
