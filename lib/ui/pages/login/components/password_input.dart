@@ -8,16 +8,22 @@ class PasswordInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final presenter = Provider.of<LoginPresenter>(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0, bottom: 32),
-      child: TextFormField(
-        decoration: const InputDecoration(
-          labelText: 'Senha',
-          icon: Icon(Icons.lock),
-        ),
-        obscureText: true,
-        onChanged: presenter.validatePassword,
-      ),
+    return StreamBuilder<String?>(
+      stream: presenter.passwordErrorStream,
+      builder: (context, snapshot) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 32),
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Senha',
+              icon: const Icon(Icons.lock),
+              errorText: snapshot.data
+            ),
+            obscureText: true,
+            onChanged: presenter.validatePassword,
+          ),
+        );
+      }
     );
   }
 }
