@@ -1,10 +1,10 @@
-import '../../../../presentation/presenters/stream_login_presenter.dart';
+import '../../../../presentation/presenters/getx_login_presenter.dart';
 import '../../../../ui/pages/login/login_presenter.dart';
 
 import '../../factories.dart';
 
-LoginPresenter makeLoginPresenter() {
-  return StreamLoginPresenter(
+LoginPresenter makeGetxLoginPresenter() {
+  return GetxLoginPresenter(
     validation: makeLoginValidation(),
     authentication: makeRemoteAuthentication(),
   );

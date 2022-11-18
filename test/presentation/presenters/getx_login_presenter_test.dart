@@ -1,3 +1,4 @@
+import 'package:flutter_tdd/presentation/presenters/presenters.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:faker/faker.dart';
 import 'package:mocktail/mocktail.dart';
@@ -6,7 +7,6 @@ import 'package:flutter_tdd/domain/entities/entities.dart';
 import 'package:flutter_tdd/domain/usecases/usecase.dart';
 import 'package:flutter_tdd/domain/helpers/helpers.dart';
 
-import 'package:flutter_tdd/presentation/presenters/stream_login_presenter.dart';
 import 'package:flutter_tdd/presentation/protocols/protocols.dart';
 
 class ValidationSpy extends Mock implements Validation {}
@@ -24,7 +24,7 @@ class FakeParams extends Fake implements AuthenticationParams {}
 void main() {
   late ValidationSpy validation;
   late AuthenticationSpy authentication;
-  late StreamLoginPresenter sut;
+  late GetxLoginPresenter sut;
   late String email;
   late String password;
 
@@ -42,7 +42,7 @@ void main() {
   setUp(() {
     validation = ValidationSpy();
     authentication = AuthenticationSpy();
-    sut = StreamLoginPresenter(
+    sut = GetxLoginPresenter(
         validation: validation, authentication: authentication);
     email = faker.internet.email();
     password = faker.internet.password();
@@ -150,7 +150,7 @@ void main() {
     sut.validateEmail(email);
     sut.validatePassword(password);
 
-    expectLater(sut.isLoadingStream, emits(false));
+    expectLater(sut.isLoadingStream, emitsInOrder([true,false]));
     sut.mainErrorStream.listen(
         expectAsync1((error) => expect(error, 'Credenciais Inválidas')));
 
@@ -162,7 +162,7 @@ void main() {
     sut.validateEmail(email);
     sut.validatePassword(password);
 
-    expectLater(sut.isLoadingStream, emits(false));
+    expectLater(sut.isLoadingStream, emitsInOrder([true,false]));
     sut.mainErrorStream.listen(
         expectAsync1((error) => expect(error, 'Algo errado aconteceu. Tente novamente em breve.')));
 
