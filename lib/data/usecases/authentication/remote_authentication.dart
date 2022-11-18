@@ -1,8 +1,8 @@
-import '../../data/models/models.dart';
+import '../../models/models.dart';
 
-import '../../domain/entities/entities.dart';
-import '../../domain/helpers/helpers.dart';
-import '../../domain/usecases/authentication.dart';
+import '../../../domain/entities/entities.dart';
+import '../../../domain/helpers/helpers.dart';
+import '../../../domain/usecases/authentication.dart';
 
 import 'package:flutter_tdd/data/http/http.dart';
 

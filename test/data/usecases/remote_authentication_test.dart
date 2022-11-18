@@ -5,7 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:flutter_tdd/domain/usecases/authentication.dart';
 import 'package:flutter_tdd/domain/helpers/domain.error.dart';
 
-import 'package:flutter_tdd/data/usecases/remote_authentication.dart';
+import 'package:flutter_tdd/data/usecases/authentication/remote_authentication.dart';
 import 'package:flutter_tdd/data/http/http.dart';
 
 class HttpClientSpy extends Mock implements HttpClient {}
