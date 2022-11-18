@@ -1,32 +1,12 @@
-import 'package:flutter_tdd/domain/helpers/helpers.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:faker/faker.dart';
 
+import 'package:flutter_tdd/domain/helpers/helpers.dart';
 import 'package:flutter_tdd/domain/entities/account_entity.dart';
-import 'package:flutter_tdd/domain/usecases/save_current_account.dart';
-import 'package:mocktail/mocktail.dart';
 
-class LocalSaveCurrentAccount implements SaveCurrentAccount {
-  final SaveSecureCacheStorage saveSecureCacheStorage;
-
-  LocalSaveCurrentAccount({required this.saveSecureCacheStorage});
-
-  @override
-  Future<void> save(AccountEntity account) async {
-    try {
-      await saveSecureCacheStorage.saveSecure(
-        key: 'token',
-        value: account.token,
-      );
-    } catch (e) {
-      throw DomainError.unexpected;
-    }
-  }
-}
-
-abstract class SaveSecureCacheStorage {
-  Future<void>? saveSecure({required String key, required String value});
-}
+import 'package:flutter_tdd/data/usecases/usecases.dart';
+import 'package:flutter_tdd/data/cache/cache.dart';
 
 class SaveSecureCacheStorageSpy extends Mock implements SaveSecureCacheStorage {
 }
@@ -58,7 +38,7 @@ void main() {
 
   test('Should throw UnnexpectedError if SaveCacheStorage throws', () async {
     mockError();
-    
+
     final future = sut.save(account);
 
     expect(future, throwsA(DomainError.unexpected));
