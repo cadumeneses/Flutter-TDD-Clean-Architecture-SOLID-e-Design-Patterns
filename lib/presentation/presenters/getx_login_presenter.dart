@@ -12,6 +12,7 @@ class LoginState {}
 class GetxLoginPresenter extends GetxController implements LoginPresenter {
   final Validation validation;
   final Authentication authentication;
+  final SaveCurrentAccount saveCurrentAccount;
 
   String? _email;
   String? _password;
@@ -36,6 +37,7 @@ class GetxLoginPresenter extends GetxController implements LoginPresenter {
   GetxLoginPresenter({
     required this.validation,
     required this.authentication,
+    required this.saveCurrentAccount,
   });
 
   @override
@@ -65,12 +67,13 @@ class GetxLoginPresenter extends GetxController implements LoginPresenter {
     try {
       _isLoading.value = true;
       _validateForm();
-      await authentication.auth(
+      final account = await authentication.auth(
         AuthenticationParams(
           email: _email!,
           password: _password!,
         ),
       );
+      await saveCurrentAccount.save(account);
     } on DomainError catch (e) {
       _mainError.value = e.description;
     }

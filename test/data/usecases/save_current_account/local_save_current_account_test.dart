@@ -9,6 +9,13 @@ import 'package:flutter_tdd/data/usecases/usecases.dart';
 import 'package:flutter_tdd/data/cache/cache.dart';
 
 class SaveSecureCacheStorageSpy extends Mock implements SaveSecureCacheStorage {
+  SaveSecureCacheStorageSpy() {
+    mockSave();
+  }
+
+  When mockSaveCall() => when(
+      () => saveSecure(key: any(named: 'key'), value: any(named: 'value')));
+  void mockSave() => mockSaveCall().thenAnswer((_) async => _);
 }
 
 void main() {

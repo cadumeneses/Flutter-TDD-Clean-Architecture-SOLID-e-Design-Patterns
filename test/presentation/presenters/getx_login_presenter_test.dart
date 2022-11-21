@@ -11,15 +11,27 @@ import 'package:flutter_tdd/presentation/protocols/protocols.dart';
 
 class ValidationSpy extends Mock implements Validation {}
 
+class SaveCurrentAccountSpy extends Mock implements SaveCurrentAccount {
+  SaveCurrentAccountSpy() {
+    mockSave();
+  }
+
+  When mockSaveCall() => when(() => save(any()));
+  void mockSave() => mockSaveCall().thenAnswer((_) async => _);
+  void mockSaveError() => mockSaveCall().thenThrow(DomainError.unexpected);
+}
+
 class AuthenticationSpy extends Mock implements Authentication {
   When mockAuthenticationCall() => when(() => auth(any()));
-  void mockAuthentication() => mockAuthenticationCall()
-      .thenAnswer((_) async => AccountEntity(faker.guid.guid()));
+  void mockAuthentication(AccountEntity data) =>
+      mockAuthenticationCall().thenAnswer((_) async => data);
   void mockAuthenticationError(DomainError error) =>
       mockAuthenticationCall().thenThrow(error);
 }
 
-class FakeParams extends Fake implements AuthenticationParams {} 
+class FakeParams extends Fake implements AuthenticationParams {}
+
+class FakeAccount extends Fake implements AccountEntity {}
 
 void main() {
   late ValidationSpy validation;
@@ -27,6 +39,8 @@ void main() {
   late GetxLoginPresenter sut;
   late String email;
   late String password;
+  late AccountEntity account;
+  late SaveCurrentAccountSpy saveCurrentAccount;
 
   When mockValidationCall(String? field) => when(() => validation.validate(
       field: field ?? any(named: 'field'), value: any(named: 'value')));
@@ -35,18 +49,24 @@ void main() {
     mockValidationCall(field).thenReturn(value);
   }
 
-  setUpAll((){
+  setUpAll(() {
     registerFallbackValue(FakeParams());
+    registerFallbackValue(FakeAccount());
   });
 
   setUp(() {
     validation = ValidationSpy();
+    account = FakeAccount();
+    saveCurrentAccount = SaveCurrentAccountSpy();
     authentication = AuthenticationSpy();
     sut = GetxLoginPresenter(
-        validation: validation, authentication: authentication);
+      validation: validation,
+      authentication: authentication,
+      saveCurrentAccount: saveCurrentAccount,
+    );
     email = faker.internet.email();
     password = faker.internet.password();
-    authentication.mockAuthentication();
+    authentication.mockAuthentication(account);
   });
 
   test('Should call Validation with correct email', () {
@@ -145,12 +165,21 @@ void main() {
     ).called(1);
   });
 
+  test('Should call SaveCurrentAccount with correct values', () async {
+    sut.validateEmail(email);
+    sut.validatePassword(password);
+
+    await sut.auth();
+
+    verify(() => saveCurrentAccount.save(account)).called(1);
+  });
+
   test('Should emit correct events on InvalidCredencialsError', () async {
     authentication.mockAuthenticationError(DomainError.invalidCredecials);
     sut.validateEmail(email);
     sut.validatePassword(password);
 
-    expectLater(sut.isLoadingStream, emitsInOrder([true,false]));
+    expectLater(sut.isLoadingStream, emitsInOrder([true, false]));
     sut.mainErrorStream.listen(
         expectAsync1((error) => expect(error, 'Credenciais Inválidas')));
 
@@ -162,9 +191,9 @@ void main() {
     sut.validateEmail(email);
     sut.validatePassword(password);
 
-    expectLater(sut.isLoadingStream, emitsInOrder([true,false]));
-    sut.mainErrorStream.listen(
-        expectAsync1((error) => expect(error, 'Algo errado aconteceu. Tente novamente em breve.')));
+    expectLater(sut.isLoadingStream, emitsInOrder([true, false]));
+    sut.mainErrorStream.listen(expectAsync1((error) =>
+        expect(error, 'Algo errado aconteceu. Tente novamente em breve.')));
 
     await sut.auth();
   });
