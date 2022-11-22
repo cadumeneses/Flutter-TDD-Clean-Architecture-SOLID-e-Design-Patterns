@@ -14,6 +14,7 @@ class ValidationSpy extends Mock implements Validation {}
 class SaveCurrentAccountSpy extends Mock implements SaveCurrentAccount {
   SaveCurrentAccountSpy() {
     mockSave();
+    mockSaveError();
   }
 
   When mockSaveCall() => when(() => save(any()));
@@ -172,6 +173,18 @@ void main() {
     await sut.auth();
 
     verify(() => saveCurrentAccount.save(account)).called(1);
+  });
+
+  test('Should emit UnecpectedError if SaveCurrentAccount fails', () async {
+    saveCurrentAccount.mockSaveError();
+    sut.validateEmail(email);
+    sut.validatePassword(password);
+
+    expectLater(sut.isLoadingStream, emitsInOrder([true, false]));
+    sut.mainErrorStream.listen(expectAsync1((error) =>
+        expect(error, 'Algo errado aconteceu. Tente novamente em breve.')));
+
+    await sut.auth();
   });
 
   test('Should emit correct events on InvalidCredencialsError', () async {
