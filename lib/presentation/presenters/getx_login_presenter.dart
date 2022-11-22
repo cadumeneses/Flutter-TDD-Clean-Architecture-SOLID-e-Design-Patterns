@@ -76,9 +76,8 @@ class GetxLoginPresenter extends GetxController implements LoginPresenter {
       await saveCurrentAccount.save(account);
     } on DomainError catch (e) {
       _mainError.value = e.description;
+      _isLoading.value = false;
     }
-    _isLoading.value = false;
-    _validateForm();
   }
 
   @override
