@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_tdd/ui/pages/pages.dart';
 import 'package:get/get.dart';
 
@@ -20,6 +19,7 @@ class GetxLoginPresenter extends GetxController implements LoginPresenter {
   final _emailError = Rx<String?>(null);
   final _passwordError = Rx<String?>(null);
   final _mainError = Rx<String?>(null);
+  final _navigateTo = Rx<String?>('');
   final _isFormValid = false.obs;
   final _isLoading = false.obs;
 
@@ -29,6 +29,8 @@ class GetxLoginPresenter extends GetxController implements LoginPresenter {
   Stream<String?> get passwordErrorStream => _passwordError.stream;
   @override
   Stream<String?> get mainErrorStream => _mainError.stream;
+  @override
+  Stream<String?> get navigateToStream => _navigateTo.stream;
   @override
   Stream<bool> get isFormValidStream => _isFormValid.stream;
   @override
@@ -68,12 +70,10 @@ class GetxLoginPresenter extends GetxController implements LoginPresenter {
       _isLoading.value = true;
       _validateForm();
       final account = await authentication.auth(
-        AuthenticationParams(
-          email: _email!,
-          password: _password!,
-        ),
+        AuthenticationParams(email: _email!, password: _password!),
       );
       await saveCurrentAccount.save(account);
+      _navigateTo.value = '/surveys';
     } on DomainError catch (e) {
       _mainError.value = e.description;
       _isLoading.value = false;

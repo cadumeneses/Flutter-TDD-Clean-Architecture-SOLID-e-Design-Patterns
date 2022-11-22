@@ -4,12 +4,14 @@ import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tdd/ui/pages/pages.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
 import 'package:mocktail/mocktail.dart';
 
 class LoginPresenterSpy extends Mock implements LoginPresenter {
   final emailErrorController = StreamController<String?>();
   final passwordErrorController = StreamController<String?>();
   final mainErrorController = StreamController<String?>();
+  final navigateToController = StreamController<String?>();
   final isFormValidController = StreamController<bool>();
   final isLoadingController = StreamController<bool>();
 
@@ -19,6 +21,7 @@ class LoginPresenterSpy extends Mock implements LoginPresenter {
     when(() => passwordErrorStream)
         .thenAnswer((_) => passwordErrorController.stream);
     when(() => mainErrorStream).thenAnswer((_) => mainErrorController.stream);
+    when(() => navigateToStream).thenAnswer((_) => navigateToController.stream);
     when(() => isFormValidStream)
         .thenAnswer((_) => isFormValidController.stream);
     when(() => isLoadingStream).thenAnswer((_) => isLoadingController.stream);
@@ -32,12 +35,14 @@ class LoginPresenterSpy extends Mock implements LoginPresenter {
   void emitFormValid() => isFormValidController.add(true);
   void emitLoading([bool show = true]) => isLoadingController.add(show);
   void emitMainError(String error) => mainErrorController.add(error);
+  void emit(String error) => mainErrorController.add(error);
 
   @override
   void dispose() {
     emailErrorController.close();
     passwordErrorController.close();
     mainErrorController.close();
+    navigateToController.close();
     isFormValidController.close();
     isLoadingController.close();
   }
@@ -48,7 +53,13 @@ void main() {
 
   Future<void> loadPage(WidgetTester tester) async {
     presenter = LoginPresenterSpy();
-    final loginPage = MaterialApp(home: LoginPage(presenter));
+    final loginPage = GetMaterialApp(
+      initialRoute: '/login',
+      getPages: [
+        GetPage(name: '/login', page: () => LoginPage(presenter)),
+        GetPage(name: '/fake_page', page: () => const Scaffold(body: Text('fake page'),)),
+      ],
+    );
     await tester.pumpWidget(loginPage);
   }
 
@@ -115,16 +126,6 @@ void main() {
     expect(find.text('any error'), findsOneWidget);
   });
 
-  // testWidgets('Shold call authentication on form submit',
-  //     (WidgetTester tester) async {
-  //   await loadPage(tester);
-  //   presenter.emitLoading(true);
-  //   await tester.pump();
-  //   await tester.tap(find.byType(ElevatedButton));
-  //   await tester.pump();
-  //   verify(() => presenter.auth()).called(1);
-  // });
-
   testWidgets('Shold present loading', (WidgetTester tester) async {
     await loadPage(tester);
     presenter.emitLoading(true);
@@ -152,11 +153,13 @@ void main() {
     expect(find.text('main error'), findsOneWidget);
   });
 
-  // testWidgets('Shold close streams on dispose', (WidgetTester tester) async {
-  //   await loadPage(tester);
+  testWidgets('Shold chage page', (WidgetTester tester) async {
+    await loadPage(tester);
 
-  //   addTearDown(() {
-  //     verify(() => presenter.dispose());
-  //   });
-  // });
+    presenter.navigateToController.add('fake_page');
+    await tester.pumpAndSettle();
+
+    expect(Get.currentRoute, 'fake_page');
+    expect(find.text('fake page'), findsOneWidget);
+  });
 }
