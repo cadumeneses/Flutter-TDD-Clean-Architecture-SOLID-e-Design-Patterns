@@ -8,7 +8,7 @@ import 'package:flutter_tdd/ui/pages/pages.dart';
 
 class SplashPrensenterSpy extends Mock implements SplashPresenter {
   SplashPrensenterSpy() {
-    when(() => loadCurrentAccount()).thenAnswer((_) async => _);
+    when(() => checkAccount()).thenAnswer((_) async => _);
   }
 }
 
@@ -48,7 +48,7 @@ void main() {
       (WidgetTester tester) async {
     await loadPage(tester);
 
-    verify(() => presenter.loadCurrentAccount()).called(1);
+    verify(() => presenter.checkAccount()).called(1);
   });
 
   testWidgets('Should change page', (WidgetTester tester) async {
