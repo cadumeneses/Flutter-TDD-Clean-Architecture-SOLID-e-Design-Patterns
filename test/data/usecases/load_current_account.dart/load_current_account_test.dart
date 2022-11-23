@@ -1,30 +1,12 @@
-import 'package:faker/faker.dart';
-import 'package:flutter_tdd/domain/helpers/helpers.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:faker/faker.dart';
 
 import 'package:flutter_tdd/domain/entities/entities.dart';
-import 'package:flutter_tdd/domain/usecases/usecase.dart';
+import 'package:flutter_tdd/domain/helpers/helpers.dart';
 
-class LocalCurrentAccount implements LoadCurrentAccount {
-  final FetchSecureCacheStorage fetchSecureCacheStorage;
-
-  LocalCurrentAccount({required this.fetchSecureCacheStorage});
-
-  @override
-  Future<AccountEntity> load() async {
-    try {
-      final token = await fetchSecureCacheStorage.fetchSecure('token');
-      return AccountEntity(token);
-    } catch (e) {
-      throw DomainError.unexpected;
-    }
-  }
-}
-
-abstract class FetchSecureCacheStorage {
-  Future<String> fetchSecure(String key);
-}
+import 'package:flutter_tdd/data/cache/cache.dart';
+import 'package:flutter_tdd/data/usecases/usecases.dart';
 
 class FetchSecureCacheStorageSpy extends Mock
     implements FetchSecureCacheStorage {
@@ -37,7 +19,7 @@ class FetchSecureCacheStorageSpy extends Mock
 
 void main() {
   late FetchSecureCacheStorage fetchSecureCacheStorage;
-  late LocalCurrentAccount sut;
+  late LocalLoadCurrentAccount sut;
   late String token;
 
   When mockFetchSecureCall() =>
@@ -53,7 +35,7 @@ void main() {
 
   setUp(() {
     fetchSecureCacheStorage = FetchSecureCacheStorageSpy();
-    sut = LocalCurrentAccount(fetchSecureCacheStorage: fetchSecureCacheStorage);
+    sut = LocalLoadCurrentAccount(fetchSecureCacheStorage: fetchSecureCacheStorage);
     token = faker.guid.guid();
     mockFetchSecure();
   });
