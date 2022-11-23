@@ -15,9 +15,10 @@ class FlutterSecureStorageSpy extends Mock implements FlutterSecureStorage {
   void mockSaveError() =>
       when(() => write(key: any(named: 'key'), value: any(named: 'value')))
           .thenThrow(Exception());
-  
+
   When mockFetchCall() => when(() => read(key: any(named: 'key')));
   void mockFetch(String? key) => mockFetchCall().thenAnswer((_) async => key);
+  void mockFetchError() => mockFetchCall().thenThrow(Exception());
 }
 
 void main() {
@@ -47,7 +48,7 @@ void main() {
 
       expect(future, throwsA(const TypeMatcher<Exception>()));
     });
-  }); 
+  });
 
   group('fetchSecure', () {
     test('Should call fetch secure with correct values', () async {
@@ -55,5 +56,13 @@ void main() {
 
       verify(() => secureStorage.read(key: key!));
     });
-  }); 
+
+    test('Should throw if fetch secure throws', () async {
+      secureStorage.mockFetchError();
+
+      final future = sut.fetchSecure(key!);
+
+      expect(future, throwsA(const TypeMatcher<Exception>()));
+    });
+  });
 }
