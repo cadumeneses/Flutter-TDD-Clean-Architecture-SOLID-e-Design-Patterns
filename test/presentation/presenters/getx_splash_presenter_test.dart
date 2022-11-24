@@ -1,33 +1,10 @@
-import 'package:flutter_tdd/domain/entities/entities.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:flutter_tdd/domain/entities/entities.dart';
 import 'package:flutter_tdd/domain/usecases/usecase.dart';
 
-import 'package:flutter_tdd/ui/pages/splash/splash.dart';
-
-class GetxSplashPresenter implements SplashPresenter {
-  final LoadCurrentAccount loadCurrentAccount;
-
-  GetxSplashPresenter({required this.loadCurrentAccount});
-
-  final _navigateTo = Rx<String?>(null);
-
-  @override
-  Stream<String?> get navigateToStream => _navigateTo.stream;
-
-  @override
-  Future<void> checkAccount() async {
-    try {
-    await loadCurrentAccount.load();
-    _navigateTo.value = '/surveys';
-      
-    } catch (e) {
-      _navigateTo.value = '/login';
-    }
-  }
-}
+import 'package:flutter_tdd/presentation/presenters/presenters.dart';
 
 class LoadCurrentAccountSpy extends Mock implements LoadCurrentAccount {
   When mockLoadCall() => when(() => load());
