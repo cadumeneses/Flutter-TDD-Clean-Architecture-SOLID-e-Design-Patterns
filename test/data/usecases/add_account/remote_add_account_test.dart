@@ -3,6 +3,7 @@ import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_tdd/domain/usecases/usecase.dart';
+import 'package:flutter_tdd/domain/helpers/helpers.dart';
 
 import 'package:flutter_tdd/data/http/http.dart';
 import 'package:flutter_tdd/data/usecases/usecases.dart';
@@ -39,5 +40,18 @@ void main() {
         'passwordConfirmation': params.passwordConfirmation,
       },
     ));
+  });
+
+  test('Should throw UnexpectedError if httpClient returns 404', () async {
+
+    when(httpClient.request(
+            url: anyNamed('url'),
+            method: anyNamed('method'),
+            body: anyNamed('body')))
+        .thenThrow(HttpError.notFound);
+
+    final future = sut.add(params);
+
+    expect(future, throwsA(DomainError.unexpected));
   });
 }
