@@ -16,8 +16,10 @@ void main() {
   late String url;
   late AddAccountParams params;
 
-  When mockRequest() =>
-    when(()=>httpClient.request(url: any(named:'url'), method: any(named:'method'), body: any(named:'body')));
+  When mockRequest() => when(() => httpClient.request(
+      url: any(named: 'url'),
+      method: any(named: 'method'),
+      body: any(named: 'body')));
 
   void mockHttpError(HttpError error) {
     mockRequest().thenThrow(error);
@@ -37,16 +39,16 @@ void main() {
   test('Should call HttpClient with correct values', () async {
     await sut.add(params);
 
-    verify(()=>httpClient.request(
-      url: url,
-      method: 'post',
-      body: {
-        'name': params.name,
-        'email': params.email,
-        'password': params.password,
-        'passwordConfirmation': params.passwordConfirmation,
-      },
-    ));
+    verify(() => httpClient.request(
+          url: url,
+          method: 'post',
+          body: {
+            'name': params.name,
+            'email': params.email,
+            'password': params.password,
+            'passwordConfirmation': params.passwordConfirmation,
+          },
+        ));
   });
 
   test('Should throw UnexpectedError if httpClient returns 400', () async {
@@ -59,6 +61,14 @@ void main() {
 
   test('Should throw UnexpectedError if httpClient returns 404', () async {
     mockHttpError(HttpError.notFound);
+
+    final future = sut.add(params);
+
+    expect(future, throwsA(DomainError.unexpected));
+  });
+
+  test('Should throw UnexpectedError if httpClient returns 500', () async {
+    mockHttpError(HttpError.serverError);
 
     final future = sut.add(params);
 
