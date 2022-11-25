@@ -95,9 +95,17 @@ void main() {
   test('Should return an Account if HttpClient returns 200', () async {
     final validData = mockValidData();
     mockHttp(validData);
-    
+
     final account = await sut.add(params);
     
     expect(account.token, validData['accessToken']);
+  });
+
+  test('Should throw UnexpectedError if HttpClient returns 200 with invalid data', () async {
+    mockHttp({'invalid_key': 'invalid_value'});
+    
+    final future = sut.add(params);
+    
+    expect(future, throwsA(DomainError.unexpected));
   });
 }
