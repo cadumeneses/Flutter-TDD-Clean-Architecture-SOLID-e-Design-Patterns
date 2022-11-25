@@ -16,10 +16,17 @@ void main() {
   late String url;
   late AddAccountParams params;
 
+  Map mockValidData() =>
+      {'accessToken': faker.guid.guid(), 'name': faker.person.name()};
+
   When mockRequest() => when(() => httpClient.request(
       url: any(named: 'url'),
       method: any(named: 'method'),
       body: any(named: 'body')));
+
+  void mockHttp(Map data) {
+    mockRequest().thenAnswer((_) async => data);
+  }
 
   void mockHttpError(HttpError error) {
     mockRequest().thenThrow(error);
@@ -35,6 +42,7 @@ void main() {
       password: faker.internet.password(),
       passwordConfirmation: faker.internet.password(),
     );
+    mockHttp(mockValidData());
   });
   test('Should call HttpClient with correct values', () async {
     await sut.add(params);
@@ -75,11 +83,21 @@ void main() {
     expect(future, throwsA(DomainError.unexpected));
   });
 
-  test('Should throw InvalidCredentialsError if httpClient returns 403', () async {
+  test('Should throw InvalidCredentialsError if httpClient returns 403',
+      () async {
     mockHttpError(HttpError.forbiden);
 
     final future = sut.add(params);
 
     expect(future, throwsA(DomainError.emailInUse));
+  });
+
+  test('Should return an Account if HttpClient returns 200', () async {
+    final validData = mockValidData();
+    mockHttp(validData);
+    
+    final account = await sut.add(params);
+    
+    expect(account.token, validData['accessToken']);
   });
 }
